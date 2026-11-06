@@ -88,7 +88,10 @@ button:active,.btn:active{transform:scale(.96)}
 .create h2{font-family:'Yatra One',serif;font-weight:400;color:var(--gold);font-size:26px;line-height:1.2}
 .create .sub{color:var(--muted);font-size:13.5px;line-height:1.5;margin:6px 0 14px}
 .create input{text-align:center;border-radius:999px;padding:13px 16px}
-.create .btns{display:grid;gap:10px;margin-top:12px}
+.create .btns{display:grid;gap:10px;margin-top:12px;animation:pop .45s ease}
+.create .btns[hidden],.create .go[hidden]{display:none}
+.create .go{width:100%;justify-content:center;font-size:16px;padding:14px 18px;margin-top:12px}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .create .btns button{width:100%;justify-content:center;font-size:16px;padding:14px 18px}
 .create .note{font-size:12px;color:rgba(216,199,176,.75);margin-top:10px;min-height:16px;line-height:1.45}
 input{width:100%;font:inherit;font-size:16px;color:var(--ink);background:rgba(0,0,0,.35);border:1px solid rgba(255,204,102,.3);border-radius:12px;padding:12px 14px;outline:none}
@@ -133,8 +136,9 @@ footer .sig{font-family:'Dancing Script',cursive;font-style:italic;font-weight:7
   <div class="create" id="create">
     <h2>✨ Create your own</h2>
     <p class="sub">Put your name on this Diwali greeting, save it as a GIF and forward it to everyone.</p>
-    <input id="nameIn" maxlength="30" placeholder="✍️ Enter your name" autocomplete="off" enterkeyhint="done" aria-label="Your name">
-    <div class="btns">
+    <input id="nameIn" maxlength="30" placeholder="✍️ Enter your name" autocomplete="off" enterkeyhint="go" aria-label="Your name">
+    <button class="primary go" id="goBtn">Proceed ➜</button>
+    <div class="btns" id="btns" hidden>
       <button class="primary" id="gifBtn">🎞️ Save my GIF</button>
       <button class="wa" id="sendWa">Send my link on WhatsApp</button>
     </div>
@@ -311,7 +315,7 @@ const toast=t=>{const el=$('toast');el.textContent=t;el.classList.add('on');clea
 const myUrl=()=>{const u=new URL(location.origin+location.pathname);u.searchParams.set('n',NAME);return u.toString()};
 function takeName(){const i=$('nameIn'),v=clean(i.value);
  if(!v){i.classList.remove('shake');void i.offsetWidth;i.classList.add('shake');i.focus();toast('✍️ Type your name first');return false}
- if(v!==NAME){NAME=v;render();history.replaceState(null,'',myUrl());for(let k=0;k<6;k++)setTimeout(()=>launch(null,null,k%2?'heart':'double'),k*150)}
+ if(v!==NAME){NAME=v;render();for(let k=0;k<6;k++)setTimeout(()=>launch(null,null,k%2?'heart':'double'),k*150)}
  i.blur();return true}
 
 let gifBlob=null,gifFor='',gifBusy=false;
@@ -334,8 +338,15 @@ async function onGif(){if(gifBusy||!takeName())return;
  catch(e){console.error(e);gifLabels('idle');toast('Could not make the GIF — check internet & try again')}
  gifBusy=false}
 $('gifBtn').onclick=onGif;
-$('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();onGif()}});
-$('nameIn').addEventListener('input',()=>{if(gifBlob&&!gifBusy&&clean($('nameIn').value)!==gifFor)gifLabels('idle')});
+/* step 1: name → Proceed; step 2: Save GIF / WhatsApp appear. The page URL is never rewritten,
+   so a refresh always shows the original sender — the visitor's own name lives only in their shared link/GIF. */
+let ready='';
+const step=on=>{$('btns').hidden=!on;$('goBtn').hidden=on};
+function proceed(){if(gifBusy||!takeName())return;ready=NAME;step(true);
+ if(!gifBlob||gifFor!==NAME)gifLabels('idle');toast('🎉 Done! Now save your GIF or send your link')}
+$('goBtn').onclick=proceed;
+$('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ready&&clean($('nameIn').value)===ready?onGif():proceed()}});
+$('nameIn').addEventListener('input',()=>{if(!gifBusy)step(!!ready&&clean($('nameIn').value)===ready)});
 
 const MOBILE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 $('sendWa').onclick=()=>takeName()&&window.open((MOBILE?'https://wa.me/?text=':'https://web.whatsapp.com/send?text=')+encodeURIComponent(`🪔 *${NAME}* has sent you a Diwali surprise! ✨\nTap to open 👇\n${myUrl()}`),'_blank');
