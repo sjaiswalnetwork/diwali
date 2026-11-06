@@ -2,7 +2,8 @@
    Exposes window.makeDiwaliGif(name, onProgress) -> Promise<Blob>. Encoder: gifenc (MIT).
    25 fps, ~10 s loop. Only changed pixels are stored per frame (transparent + dispose:1) to keep files small. */
 (function(){
-const S=400, DELAY=40, TOTAL=10.0, FRAMES=Math.round(TOTAL*1000/DELAY);   // 250 frames
+const S=400, PX=600;                                                     // draw in 400-unit space, output 600×600 pixels
+const DELAY=40, TOTAL=10.0, FRAMES=Math.round(TOTAL*1000/DELAY);         // 250 frames, 25 fps
 const TICK=1/60;                                                         // physics step, same as the website
 const TOL=10;                                                            // per-pixel change threshold for diffing
 const GIFENC='https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js';
@@ -12,10 +13,11 @@ const IGN=2.0;                 // flame catches
 const TITLE=IGN+.7;            // शुभ दीपावली / Happy Diwali fade in
 const FW0=3.3, FW_GAP=.3, FW_N=16;   // fireworks: 3.3s → 7.8s
 const ROW0=3.9, ROW_GAP=.22;   // small diyas light one by one
-const LOVE=4.8;                // "— with love, Name"
+const QUOTE=4.2;               // the wish / quote
+const LOVE=4.9;                // "— with love, Name"
 const OUT=9.3;                 // fade to dark for a seamless loop
 
-const DIYA=`<svg xmlns="http://www.w3.org/2000/svg" width="460" height="220" viewBox="0 0 230 110"><defs>
+const DIYA=`<svg xmlns="http://www.w3.org/2000/svg" width="920" height="440" viewBox="0 0 230 110"><defs>
 <linearGradient id="clay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e06a2a"/><stop offset=".55" stop-color="#a8401a"/><stop offset="1" stop-color="#5e1f0a"/></linearGradient>
 <radialGradient id="oil" cx=".5" cy=".4" r=".7"><stop offset="0" stop-color="#7a3b0c"/><stop offset="1" stop-color="#2a0f03"/></radialGradient></defs>
 <ellipse cx="100" cy="106" rx="66" ry="4" fill="#000" opacity=".35"/>
@@ -56,15 +58,22 @@ function spawn(b,parts){const r=rng(b.seed),sp=3.3+r()*1.4;const add=p=>{p.d=(p.
  else if(b.type==='heart'){const s=sp*.17;for(let i=0;i<72;i++){const t=Math.PI*2*i/72;add({x:b.x,y:b.y,vx:16*Math.pow(Math.sin(t),3)*s,vy:-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*s,c:'255,90,150',d:.01,fr:.975,g:.016})}}
  else{for(let i=0;i<110;i++){const a=r()*7,v=sp*(.25+r()*.75);add({x:b.x,y:b.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,c:r()<.2?'255,248,230':(r()<.5?b.c:b.c2),d:.009+r()*.008})}}}
 
-async function makeDiwaliGif(name,onProgress){
+function wrap(c,text,maxW){const words=text.split(' '),lines=[];let cur='';
+ for(const w of words){const t=cur?cur+' '+w:w;if(c.measureText(t).width>maxW&&cur){lines.push(cur);cur=w}else cur=t}
+ if(cur)lines.push(cur);return lines}
+
+async function makeDiwaliGif(name,onProgress,quote){
  const {GIFEncoder,quantize,applyPalette}=await import(GIFENC);
  await Promise.all(['36px "Yatra One"','italic 18px Poppins','300 15px Poppins','600 15px Poppins'].map(f=>document.fonts.load(f).catch(()=>{})));
  const diya=await loadImg('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(DIYA));
- const cv=document.createElement('canvas');cv.width=cv.height=S;const c=cv.getContext('2d',{willReadFrequently:true});
+ const cv=document.createElement('canvas');cv.width=cv.height=PX;const c=cv.getContext('2d',{willReadFrequently:true});
+ c.imageSmoothingQuality='high';
+ c.font='400 13.5px Poppins';const qLines=quote?wrap(c,quote,330).slice(0,3):[];
  const r=rng(7),stars=[...Array(55)].map((_,i)=>[r()*S,45+r()*250,r()*.6+.25,r()*6,i%4===0]);   // only 1 in 4 twinkles
  const bursts=plan(name.length*131+17),parts=[];let fired=0,ticks=0;
  const gif=GIFEncoder();let ref=null;
- const DW=210,DH=DW*110/230,DX=(S-DW)/2-8,DY=178, fx=DX+DW*.9055,fy=DY+DH*(1-.77);
+ const DW=186,DH=DW*110/230,DX=(S-DW)/2-8,DY=160, fx=DX+DW*.9055,fy=DY+DH*(1-.77);
+ const Q0=270-(qLines.length-1)*9;   // quote block, centred around y≈278
 
  for(let i=0;i<FRAMES;i++){const t=i*DELAY/1000;
   // physics in real time: same 60 Hz step as the website
@@ -75,6 +84,7 @@ async function makeDiwaliGif(name,onProgress){
 
   // background
   let g=c.createRadialGradient(S/2,S*1.1,10,S/2,S*1.1,S*1.15);g.addColorStop(0,'#3a1020');g.addColorStop(.45,'#1c0c33');g.addColorStop(1,'#0b0820');
+  c.setTransform(PX/S,0,0,PX/S,0,0);
   c.globalCompositeOperation='source-over';c.globalAlpha=1;c.shadowBlur=0;c.fillStyle=g;c.fillRect(0,0,S,S);
   for(const [x,y,a,ph,tw] of stars){c.fillStyle=`rgba(255,255,255,${tw?a*(.55+.45*Math.sin(t*2+ph)):a})`;c.fillRect(x,y,1.6,1.6)}
 
@@ -84,9 +94,9 @@ async function makeDiwaliGif(name,onProgress){
   // rockets + particles (motion-blurred streaks)
   c.globalCompositeOperation='lighter';c.lineCap='round';
   for(const b of bursts){const u=(t-(b.t-.7))/.7;if(u>0&&u<1){const y=S+10-(S+10-b.y)*easeOut(u);
-   c.strokeStyle='rgba(255,215,150,.9)';c.lineWidth=2.2;c.beginPath();c.moveTo(b.x,y);c.lineTo(b.x,y+18);c.stroke()}}
+   const ra=.9*clamp((250-y)/30,0,1);if(ra>0){c.strokeStyle=`rgba(255,215,150,${ra})`;c.lineWidth=2.2;c.beginPath();c.moveTo(b.x,y);c.lineTo(b.x,Math.min(y+18,250));c.stroke()}}}
   // sparks bloom in over ~0.12s so bursts don't start as a solid white blob
-  for(const p of parts){const al=Math.min(1,p.l*1.3)*clamp(.25+p.age/9,0,1)*clamp((300-p.y)/45,0,1),k=p.st||3;if(al<=0.01)continue;
+  for(const p of parts){const al=Math.min(1,p.l*1.3)*clamp(.25+p.age/9,0,1)*clamp((258-p.y)/40,0,1),k=p.st||3;if(al<=0.01)continue;
    c.strokeStyle=`rgba(${p.c},${al})`;c.lineWidth=p.age<6?1.6:2.4;c.beginPath();c.moveTo(p.x-(p.x-p.px)*k,p.y-(p.y-p.py)*k);c.lineTo(p.x,p.y);c.stroke();
    if(p.dot){c.fillStyle=`rgba(${p.c},${al})`;c.beginPath();c.arc(p.x,p.y,1.9,0,7);c.fill()}}
   c.globalCompositeOperation='source-over';
@@ -113,9 +123,12 @@ async function makeDiwaliGif(name,onProgress){
    c.fillStyle='#ffcc66';c.font='34px "Yatra One"';c.fillText('शुभ दीपावली',S/2,92-(1-ta)*8);
    g=c.createLinearGradient(0,108,0,152);g.addColorStop(0,'#fff3c4');g.addColorStop(.6,'#ffb347');g.addColorStop(1,'#ff7a1a');
    c.fillStyle=g;c.font='46px "Yatra One"';c.fillText('Happy Diwali!',S/2,146-(1-ta)*6);c.shadowBlur=0;c.globalAlpha=1}
+  const qa=ease((t-QUOTE)/.9);
+  if(qa>0&&qLines.length){c.globalAlpha=qa;c.shadowColor='#0b0820';c.shadowBlur=10;c.fillStyle='#fff6e6';c.font='400 13.5px Poppins';
+   qLines.forEach((ln,k)=>c.fillText(ln,S/2,Q0+k*18+(1-qa)*6));c.shadowBlur=0;c.globalAlpha=1}
   const fa=ease((t-LOVE)/.8);
-  if(fa>0){c.globalAlpha=fa;c.shadowColor='#0b0820';c.shadowBlur=8;c.fillStyle='#ffcc66';c.font='italic 19px Poppins';
-   c.fillText('— with love, '+name,S/2,318);c.shadowBlur=0;c.globalAlpha=1}
+  if(fa>0){c.globalAlpha=fa;c.shadowColor='#0b0820';c.shadowBlur=8;c.fillStyle='#ffcc66';c.font='italic 18px Poppins';
+   c.fillText('— with love, '+name,S/2,Q0+qLines.length*18+16);c.shadowBlur=0;c.globalAlpha=1}
 
   // tiny watermark, bottom-right
   c.textAlign='right';c.fillStyle='rgba(216,199,176,.42)';c.font='italic 300 9px Poppins';c.fillText('made by Sj',S-7,S-6);
@@ -131,14 +144,15 @@ async function makeDiwaliGif(name,onProgress){
   if(dark>0){c.fillStyle=`rgba(11,8,32,${dark})`;c.fillRect(0,0,S,S)}
 
   // encode: quantize, then mark pixels that did not visibly change as transparent
-  const {data}=c.getImageData(0,0,S,S);
+  c.setTransform(1,0,0,1,0,0);
+  const {data}=c.getImageData(0,0,PX,PX);
   const pal=quantize(data,255),idx=applyPalette(data,pal);
-  if(!ref){ref=new Uint8ClampedArray(data);gif.writeFrame(idx,S,S,{palette:pal,delay:DELAY,repeat:0})}
+  if(!ref){ref=new Uint8ClampedArray(data);gif.writeFrame(idx,PX,PX,{palette:pal,delay:DELAY,repeat:0})}
   else{const T=pal.length;pal.push([0,0,0]);
    for(let p=0,q=0;q<data.length;p++,q+=4){
     if(Math.abs(data[q]-ref[q])+Math.abs(data[q+1]-ref[q+1])+Math.abs(data[q+2]-ref[q+2])<=TOL)idx[p]=T;
     else{ref[q]=data[q];ref[q+1]=data[q+1];ref[q+2]=data[q+2]}}
-   gif.writeFrame(idx,S,S,{palette:pal,delay:DELAY,transparent:true,transparentIndex:T,dispose:1})}
+   gif.writeFrame(idx,PX,PX,{palette:pal,delay:DELAY,transparent:true,transparentIndex:T,dispose:1})}
   if(onProgress)onProgress((i+1)/FRAMES);
   if(i%3===2)await yieldUI();
  }

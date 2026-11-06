@@ -350,7 +350,7 @@ async function onGif(){if(gifBusy)return;
  if(gifBlob&&gifFor===NAME){
   if(canShareFile()){try{await navigator.share({files:[gifFile()],text:'🪔 Happy Diwali! '+myUrl()})}catch(e){}}else saveGif();return}
  gifBusy=true;gifLabels('busy',0);
- try{gifBlob=await window.makeDiwaliGif(NAME,p=>gifLabels('busy',Math.round(p*100)));gifFor=NAME;saveGif();gifLabels('ready');
+ try{gifBlob=await window.makeDiwaliGif(NAME,p=>gifLabels('busy',Math.round(p*100)),$('wish').textContent);gifFor=NAME;saveGif();gifLabels('ready');
   toast(canShareFile()?'🎞️ GIF saved! Tap again to share it':'🎞️ GIF downloaded — share it anywhere!')}
  catch(e){console.error(e);gifLabels('idle');toast('Could not make the GIF — check internet & try again')}
  gifBusy=false}
