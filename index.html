@@ -155,7 +155,15 @@ footer .sig{font-family:'Dancing Script',cursive;font-style:italic;font-weight:7
 const $=id=>document.getElementById(id);
 const clean=s=>(s||'').replace(/[<>]/g,'').trim().slice(0,30);
 const q=new URLSearchParams(location.search);
-let NAME=clean(q.get('n'))||clean(q.get('from'))||'Shashank';
+/* Sender = the name in the link they opened. A link opened fresh is remembered for this tab, so a
+   refresh keeps it. A ?n= that only reappears on a refresh (left behind in the address bar by an
+   older version or a test) is ignored and wiped, so the page goes back to Shashank. */
+const DEF='Shashank',urlName=clean(q.get('n'))||clean(q.get('from'));
+let nav='navigate';try{nav=performance.getEntriesByType('navigation')[0].type}catch(e){}
+let seen='';try{seen=sessionStorage.getItem('dvSender')||''}catch(e){}
+let NAME=DEF;
+if(urlName&&(nav!=='reload'||seen===urlName)){NAME=urlName;try{sessionStorage.setItem('dvSender',urlName)}catch(e){}}
+else if(urlName)history.replaceState(null,'',location.pathname);
 
 /* ---------- copy ---------- */
 const WISHES=[
