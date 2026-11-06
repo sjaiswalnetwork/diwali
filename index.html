@@ -35,12 +35,6 @@ main,#stage{overflow-x:clip}
 .lantern::after{content:'';position:absolute;left:30%;right:30%;bottom:-3px;height:4px;border-radius:2px;background:#ffe9a8;box-shadow:0 0 8px #ffd27a}
 @keyframes rise{0%{transform:translate(0,0) rotate(-3deg);opacity:0}6%{opacity:.95}30%{transform:translate(16px,-38vh) rotate(4deg)}60%{transform:translate(-14px,-78vh) rotate(-4deg)}85%{opacity:.7}100%{transform:translate(8px,-125vh) rotate(2deg);opacity:0}}
 #flash{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;background:radial-gradient(120% 80% at 50% 25%,rgba(255,215,160,.45),rgba(255,160,80,.08) 60%,transparent 80%)}
-.card{opacity:0;transform:translateY(40px) scale(.97);transition:opacity .9s ease,transform .9s cubic-bezier(.2,1.2,.4,1)}
-.card.in{opacity:1;transform:none}
-.preview{margin-top:16px;border:1px dashed rgba(255,204,102,.4);border-radius:14px;padding:12px 14px;background:rgba(0,0,0,.25);font-size:13px;color:var(--muted);line-height:1.55}
-.preview b{color:var(--gold)}
-.preview .pv-title{font-family:'Yatra One',serif;color:#ffb347;font-size:20px;margin:2px 0}
-.preview code{display:block;margin-top:6px;font-size:11.5px;color:#ffd99a;word-break:break-all;opacity:.85}
 .hint{text-align:center;font-size:12.5px;color:rgba(255,204,102,.7);margin-top:14px;opacity:0;transition:opacity 1s ease 3.2s}
 .lit-all .hint{opacity:1}
 main{position:relative;z-index:2}
@@ -89,29 +83,20 @@ button:active,.btn:active{transform:scale(.96)}
 .ghost{background:rgba(255,255,255,.08);color:var(--ink);border:1px solid rgba(255,204,102,.35)}
 .wa{background:#25D366;color:#062b14;box-shadow:0 6px 22px rgba(37,211,102,.35)}
 
-#make{position:relative;z-index:2;padding:20px 16px 70px;display:none}
-.lit-all~#make,#make.on{display:block}
-.card{max-width:460px;margin:0 auto;background:linear-gradient(180deg,rgba(60,22,50,.75),rgba(25,10,40,.8));border:1px solid rgba(255,204,102,.28);border-radius:22px;padding:26px 20px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.card h2{font-family:'Yatra One',serif;font-weight:400;color:var(--gold);font-size:26px;text-align:center}
-.card p.sub{text-align:center;color:var(--muted);font-size:14px;margin:4px 0 18px}
-label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}
+.create{position:relative;max-width:440px;width:100%;margin:30px auto 0;text-align:center;background:linear-gradient(180deg,rgba(60,22,50,.8),rgba(25,10,40,.88));border:1px solid rgba(255,204,102,.35);border-radius:22px;padding:22px 18px 18px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 20px 60px rgba(0,0,0,.45);opacity:0;transform:translateY(24px);pointer-events:none;transition:opacity 1s ease 2.8s,transform 1s ease 2.8s}
+.lit-all .create{opacity:1;transform:none;pointer-events:auto}
+.create h2{font-family:'Yatra One',serif;font-weight:400;color:var(--gold);font-size:26px;line-height:1.2}
+.create .sub{color:var(--muted);font-size:13.5px;line-height:1.5;margin:6px 0 14px}
+.create input{text-align:center;border-radius:999px;padding:13px 16px}
+.create .btns{display:grid;gap:10px;margin-top:12px}
+.create .btns button{width:100%;justify-content:center;font-size:16px;padding:14px 18px}
+.create .note{font-size:12px;color:rgba(216,199,176,.75);margin-top:10px;min-height:16px;line-height:1.45}
 input{width:100%;font:inherit;font-size:16px;color:var(--ink);background:rgba(0,0,0,.35);border:1px solid rgba(255,204,102,.3);border-radius:12px;padding:12px 14px;outline:none}
 input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,204,102,.18)}
-.share{display:grid;gap:10px;margin-top:20px}
-.share button{justify-content:center;width:100%}
-.err{color:#ff9a8a;font-size:13px;min-height:18px;margin-top:6px}
 .toast{position:fixed;left:50%;top:78px;transform:translate(-50%,-40px);max-width:calc(100% - 32px);text-align:center;background:#2a1405;color:var(--gold);border:1px solid var(--gold);padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;transition:all .3s;z-index:20}
 .toast.on{opacity:1;transform:translate(-50%,0)}
-footer{position:relative;z-index:2;text-align:center;color:rgba(216,199,176,.55);font-size:12px;padding:0 16px 130px}
+footer{position:relative;z-index:2;text-align:center;color:rgba(216,199,176,.55);font-size:12px;padding:0 16px 30px}
 footer .sig{font-family:'Dancing Script',cursive;font-style:italic;font-weight:700;font-size:21px;color:var(--gold);letter-spacing:.3px;text-shadow:0 0 10px rgba(255,170,60,.45);vertical-align:-2px;padding:0 2px}
-.bar{position:fixed;left:0;right:0;bottom:0;z-index:10;padding:10px 14px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(20,8,30,.6),rgba(20,8,30,.95));border-top:1px solid rgba(255,204,102,.3);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.bar form,.bar #shareRow{max-width:480px;margin:0 auto}
-.bar [hidden]{display:none}
-.bar-label{font-size:12.5px;color:var(--gold);margin:0 0 7px 4px}
-.bar-row{display:flex;gap:8px}
-.bar input{flex:1;min-width:0;padding:12px 16px;border-radius:999px}
-.bar .wa{flex:1;justify-content:center;font-size:16px}
-.bar .edit{padding:12px 16px}
 .shake{animation:shake .4s}
 @keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 .mute{position:fixed;top:72px;right:12px;z-index:5;width:40px;height:40px;padding:0;justify-content:center;border-radius:50%;background:rgba(0,0,0,.35);color:var(--gold);border:1px solid rgba(255,204,102,.3);font-size:18px}
@@ -123,7 +108,7 @@ footer .sig{font-family:'Dancing Script',cursive;font-style:italic;font-weight:7
 <div id="lanterns" aria-hidden="true"></div>
 <canvas id="fx"></canvas>
 <div id="flash" aria-hidden="true"></div>
-<svg class="toran" id="toran" viewBox="0 0 400 70" preserveAspectRatio="xMidYMin slice" aria-hidden="true"></svg>
+<svg class="toran" id="toran" viewBox="0 0 400 70" aria-hidden="true"></svg>
 <button class="mute" id="mute" aria-label="Toggle sound">🔊</button>
 
 <main>
@@ -142,31 +127,23 @@ footer .sig{font-family:'Dancing Script',cursive;font-style:italic;font-weight:7
 
   <div class="actions">
     <button class="ghost" id="again">🎆 Grand finale</button>
-    <button class="primary gifbtn" id="gifBtn">🎞️ Download GIF</button>
   </div>
   <p class="hint">Tap the sky or scroll for more fireworks 🎇</p>
+
+  <div class="create" id="create">
+    <h2>✨ Create your own</h2>
+    <p class="sub">Put your name on this Diwali greeting, save it as a GIF and forward it to everyone.</p>
+    <input id="nameIn" maxlength="30" placeholder="✍️ Enter your name" autocomplete="off" enterkeyhint="done" aria-label="Your name">
+    <div class="btns">
+      <button class="primary" id="gifBtn">🎞️ Save my GIF</button>
+      <button class="wa" id="sendWa">Send my link on WhatsApp</button>
+    </div>
+    <p class="note" id="note">HD 1080p GIF · ready in a few seconds</p>
+  </div>
 </section>
 </main>
 
 <footer>Made with 🪔 by <span class="sig">Shashank</span> · Happy Diwali 2026</footer>
-
-<div class="bar" id="bar">
-  <form id="nameForm" autocomplete="off">
-    <div class="bar-label">Make this greeting yours 👇</div>
-    <div class="bar-row">
-      <input id="nameIn" maxlength="30" placeholder="✍️ Enter your name" enterkeyhint="go" aria-label="Your name">
-      <button class="primary" type="submit">Go ➜</button>
-    </div>
-  </form>
-  <div id="shareRow" hidden>
-    <div class="bar-label">Done! Now send it to everyone 👇</div>
-    <div class="bar-row">
-      <button class="wa" id="sendWa">Send on WhatsApp</button>
-      <button class="ghost edit gifbtn" id="gifBtn2" aria-label="Download as GIF">🎞️</button>
-      <button class="ghost edit" id="edit" aria-label="Change name">✏️</button>
-    </div>
-  </div>
-</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -174,7 +151,7 @@ footer .sig{font-family:'Dancing Script',cursive;font-style:italic;font-weight:7
 const $=id=>document.getElementById(id);
 const clean=s=>(s||'').replace(/[<>]/g,'').trim().slice(0,30);
 const q=new URLSearchParams(location.search);
-let NAME=clean(q.get('n'))||clean(q.get('from'))||'Sj';
+let NAME=clean(q.get('n'))||clean(q.get('from'))||'Shashank';
 
 /* ---------- copy ---------- */
 const WISHES=[
@@ -188,7 +165,7 @@ function render(){
  let h=0;for(const c of NAME)h=(h*31+c.charCodeAt(0))>>>0;
  $('wish').textContent=WISHES[h%WISHES.length];
  $('from').textContent='— with love, '+NAME;
- $('hello').textContent='A Diwali surprise for you 🪔';
+ const hello=$('hello'),b=document.createElement('b');b.textContent=NAME;hello.textContent='';hello.append(b,' has sent you a Diwali surprise 🪔');
  document.title='🪔 '+NAME+' wishes you a Happy Diwali';
 }
 render();
@@ -217,12 +194,15 @@ for(let i=0;i<70;i++){const s=document.createElement('div');s.className='star';
  s.style.left=Math.random()*100+'%';s.style.top=Math.random()*65+'%';
  s.style.animationDelay=(Math.random()*3)+'s';s.style.opacity=Math.random();
  if(Math.random()<.15){s.style.width=s.style.height='3px'}sky.appendChild(s)}
-(function toran(){let g='<path d="M-10 6 Q200 40 410 6" stroke="#5a3a10" stroke-width="1.5" fill="none"/>';
- for(let x=-4;x<=404;x+=13){const y=6+34*Math.sin(Math.PI*(x+10)/420)*0.85;
-  const c=(Math.round(x/13)%2)?'#ffb000':'#ff7a00';
+/* garland drawn at the real screen width, so flowers stay the same size on phones and wide monitors */
+function toran(){const W=Math.max(320,document.documentElement.clientWidth),t=$('toran');t.setAttribute('viewBox',`0 0 ${W} 70`);
+ let g=`<path d="M-10 6 Q${W/2} 46 ${W+10} 6" stroke="#5a3a10" stroke-width="1.5" fill="none"/>`;
+ for(let i=0,x=-4;x<=W+4;i++,x+=13){const y=6+29*Math.sin(Math.PI*(x+10)/(W+20));
+  const c=(i%2)?'#ffb000':'#ff7a00';
   g+=`<circle cx="${x}" cy="${y}" r="7.2" fill="${c}"/><circle cx="${x}" cy="${y}" r="7.2" fill="none" stroke="#c45500" stroke-width="1.2" stroke-dasharray="2 2"/><circle cx="${x}" cy="${y}" r="2.2" fill="#b34700"/>`;
-  if(Math.round(x/13)%3===0)g+=`<path d="M${x} ${y+6} q6 10 0 20 q-6 -10 0 -20z" fill="#2f8a3a"/>`;}
- $('toran').innerHTML=g})();
+  if(i%3===0)g+=`<path d="M${x} ${y+6} q6 10 0 20 q-6 -10 0 -20z" fill="#2f8a3a"/>`;}
+ t.innerHTML=g}
+toran();let tt;addEventListener('resize',()=>{clearTimeout(tt);tt=setTimeout(toran,150)});
 
 /* ---------- sound (synth, no files) ---------- */
 let ac=null,muted=false;
@@ -323,42 +303,42 @@ let lastY=scrollY,acc=0;
 addEventListener('scroll',()=>{const y=scrollY;acc+=Math.abs(y-lastY);lastY=y;if(!done){acc=0;return}
  while(acc>80){acc-=80;launch(null,H*rnd(.06,.38))}},{passive:true});
 /* tap the sky = rocket to that spot */
-document.addEventListener('pointerdown',e=>{if(!done||e.target.closest('button,input,a,.bar,#main'))return;
+document.addEventListener('pointerdown',e=>{if(!done||e.target.closest('button,input,a,.create,#main'))return;
  launch(e.clientX,Math.max(H*.06,e.clientY))});
 
-/* ---------- make it yours: one name, one tap ---------- */
-const toast=t=>{const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),2400)};
+/* ---------- create your own: name → Save my GIF / send link ---------- */
+const toast=t=>{const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),2600)};
 const myUrl=()=>{const u=new URL(location.origin+location.pathname);u.searchParams.set('n',NAME);return u.toString()};
-$('nameForm').addEventListener('submit',e=>{e.preventDefault();
- const v=clean($('nameIn').value);
- if(!v){const i=$('nameIn');i.classList.remove('shake');void i.offsetWidth;i.classList.add('shake');i.focus();return}
- NAME=v;render();history.replaceState(null,'',myUrl());$('nameIn').blur();
- $('nameForm').hidden=true;$('shareRow').hidden=false;
- if(!done)light();else{for(let i=0;i<6;i++)setTimeout(()=>launch(null,null,i%2?'heart':'double'),i*150)}
- scrollTo({top:0,behavior:'smooth'});toast('✨ Now it says “'+NAME+'” — send it!')});
-$('edit').onclick=()=>{$('shareRow').hidden=true;$('nameForm').hidden=false;$('nameIn').value=NAME;$('nameIn').focus()};
-/* ---------- GIF: one full animation cycle with the current name ---------- */
+function takeName(){const i=$('nameIn'),v=clean(i.value);
+ if(!v){i.classList.remove('shake');void i.offsetWidth;i.classList.add('shake');i.focus();toast('✍️ Type your name first');return false}
+ if(v!==NAME){NAME=v;render();history.replaceState(null,'',myUrl());for(let k=0;k<6;k++)setTimeout(()=>launch(null,null,k%2?'heart':'double'),k*150)}
+ i.blur();return true}
+
 let gifBlob=null,gifFor='',gifBusy=false;
-const gifFile=()=>new File([gifBlob],`Happy-Diwali-${NAME.replace(/[^\wऀ-ॿ-]+/g,'-')}.gif`,{type:'image/gif'});
-const canShareFile=()=>{try{return !!(navigator.canShare&&navigator.canShare({files:[gifFile()]}))}catch(e){return false}};
-function saveGif(){const a=document.createElement('a');a.href=URL.createObjectURL(gifBlob);a.download=gifFile().name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
-function gifLabels(state,p){const big=$('gifBtn'),small=$('gifBtn2');
- if(state==='busy'){big.textContent='⏳ Making GIF… '+p+'%';small.textContent=p+'%'}
- else if(state==='ready'){big.textContent=canShareFile()?'📤 Share GIF':'✅ GIF saved — tap to save again';small.textContent=canShareFile()?'📤':'✅'}
- else{big.textContent='🎞️ Download GIF';small.textContent='🎞️'}}
-async function onGif(){if(gifBusy)return;
+const NOTE_IDLE='HD 1080p GIF · keep this page open while it’s made';
+const gifFile=()=>new File([gifBlob],`Happy-Diwali-${gifFor.replace(/[^\wऀ-ॿ-]+/g,'-')}.gif`,{type:'image/gif'});
+const canShareFile=()=>{try{return !!(gifBlob&&navigator.canShare&&navigator.canShare({files:[gifFile()]}))}catch(e){return false}};
+function saveGif(){const a=document.createElement('a');a.href=URL.createObjectURL(gifBlob);a.download=gifFile().name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000)}
+function gifLabels(state,p){const btn=$('gifBtn'),note=$('note');
+ if(state==='busy'){btn.textContent='⏳ Making your GIF… '+p+'%';note.textContent='Making a high-quality GIF with your name — keep this page open'}
+ else if(state==='ready'){const sh=canShareFile();btn.textContent=sh?'📤 Share my GIF':'✅ Saved — tap to save again';
+  note.textContent=sh?'Saved! Tap “Share my GIF” to send it on WhatsApp, Instagram & more':'Saved to your Downloads — forward it to anyone 🎉'}
+ else{btn.textContent='🎞️ Save my GIF';note.textContent=NOTE_IDLE}}
+$('note').textContent=NOTE_IDLE;
+async function onGif(){if(gifBusy||!takeName())return;
  if(gifBlob&&gifFor===NAME){
-  if(canShareFile()){try{await navigator.share({files:[gifFile()],text:'🪔 Happy Diwali! '+myUrl()})}catch(e){}}else saveGif();return}
+  if(canShareFile()){try{await navigator.share({files:[gifFile()],text:'🪔 Happy Diwali from '+NAME+'! Make yours: '+myUrl()})}catch(e){}}else saveGif();return}
  gifBusy=true;gifLabels('busy',0);
- try{gifBlob=await window.makeDiwaliGif(NAME,p=>gifLabels('busy',Math.round(p*100)),$('wish').textContent);gifFor=NAME;saveGif();gifLabels('ready');
-  toast(canShareFile()?'🎞️ GIF saved! Tap again to share it':'🎞️ GIF downloaded — share it anywhere!')}
+ try{const who=NAME;gifBlob=await window.makeDiwaliGif(who,p=>gifLabels('busy',Math.round(p*100)),$('wish').textContent);gifFor=who;saveGif();gifLabels('ready');
+  toast('🎞️ Your GIF is saved!')}
  catch(e){console.error(e);gifLabels('idle');toast('Could not make the GIF — check internet & try again')}
  gifBusy=false}
-$('gifBtn').onclick=onGif;$('gifBtn2').onclick=onGif;
-$('nameForm').addEventListener('submit',()=>{if(gifFor!==NAME&&!gifBusy)gifLabels('idle')});
+$('gifBtn').onclick=onGif;
+$('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();onGif()}});
+$('nameIn').addEventListener('input',()=>{if(gifBlob&&!gifBusy&&clean($('nameIn').value)!==gifFor)gifLabels('idle')});
 
 const MOBILE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-$('sendWa').onclick=()=>window.open((MOBILE?'https://wa.me/?text=':'https://web.whatsapp.com/send?text=')+encodeURIComponent(`🪔 *${NAME}* has sent you a Diwali surprise! ✨\nTap to open 👇\n${myUrl()}`),'_blank');
+$('sendWa').onclick=()=>takeName()&&window.open((MOBILE?'https://wa.me/?text=':'https://web.whatsapp.com/send?text=')+encodeURIComponent(`🪔 *${NAME}* has sent you a Diwali surprise! ✨\nTap to open 👇\n${myUrl()}`),'_blank');
 })();
 </script>
 <script src="gif.js" defer></script>

@@ -2,8 +2,11 @@
    Exposes window.makeDiwaliGif(name, onProgress) -> Promise<Blob>. Encoder: gifenc (MIT).
    25 fps, ~10 s loop. Only changed pixels are stored per frame (transparent + dispose:1) to keep files small. */
 (function(){
-const S=400, PX=600;                                                     // draw in 400-unit space, output 600×600 pixels
-const DELAY=40, TOTAL=10.0, FRAMES=Math.round(TOTAL*1000/DELAY);         // 250 frames, 25 fps
+const S=400, PX=1080;                                                    // draw in 400-unit space, output 1080×1080 pixels
+const FPS=30, TOTAL=10.0, FRAMES=Math.round(TOTAL*FPS);                  // 300 frames, true 30 fps
+const DELAY=1000/FPS;                                                    // 33.3 ms
+// GIF delays are in 1/100 s, so alternate 30/30/40 ms — averages exactly 33.3 ms (no drift)
+const delayOf=i=>Math.round((i+1)*100/FPS)*10-Math.round(i*100/FPS)*10;
 const TICK=1/60;                                                         // physics step, same as the website
 const TOL=10;                                                            // per-pixel change threshold for diffing
 const GIFENC='https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js';
@@ -71,7 +74,7 @@ async function makeDiwaliGif(name,onProgress,quote){
  c.font='400 13.5px Poppins';const qLines=quote?wrap(c,quote,330).slice(0,3):[];
  const r=rng(7),stars=[...Array(55)].map((_,i)=>[r()*S,45+r()*250,r()*.6+.25,r()*6,i%4===0]);   // only 1 in 4 twinkles
  const bursts=plan(name.length*131+17),parts=[];let fired=0,ticks=0;
- const gif=GIFEncoder();let ref=null;
+ const gif=GIFEncoder();let ref=null;const sample=new Uint8ClampedArray(Math.ceil(PX*PX/3)*4);
  const DW=186,DH=DW*110/230,DX=(S-DW)/2-8,DY=160, fx=DX+DW*.9055,fy=DY+DH*(1-.77);
  const Q0=270-(qLines.length-1)*9;   // quote block, centred around y≈278
 
@@ -146,15 +149,17 @@ async function makeDiwaliGif(name,onProgress,quote){
   // encode: quantize, then mark pixels that did not visibly change as transparent
   c.setTransform(1,0,0,1,0,0);
   const {data}=c.getImageData(0,0,PX,PX);
-  const pal=quantize(data,255),idx=applyPalette(data,pal);
-  if(!ref){ref=new Uint8ClampedArray(data);gif.writeFrame(idx,PX,PX,{palette:pal,delay:DELAY,repeat:0})}
+  // build the 255-colour palette from every 3rd pixel (fast at 1080p, same colours), then map all pixels
+  for(let q=0,o=0;q<data.length;q+=12,o+=4){sample[o]=data[q];sample[o+1]=data[q+1];sample[o+2]=data[q+2];sample[o+3]=255}
+  const pal=quantize(sample,255),idx=applyPalette(data,pal),dl=delayOf(i);
+  if(!ref){ref=new Uint8ClampedArray(data);gif.writeFrame(idx,PX,PX,{palette:pal,delay:dl,repeat:0})}
   else{const T=pal.length;pal.push([0,0,0]);
    for(let p=0,q=0;q<data.length;p++,q+=4){
     if(Math.abs(data[q]-ref[q])+Math.abs(data[q+1]-ref[q+1])+Math.abs(data[q+2]-ref[q+2])<=TOL)idx[p]=T;
     else{ref[q]=data[q];ref[q+1]=data[q+1];ref[q+2]=data[q+2]}}
-   gif.writeFrame(idx,PX,PX,{palette:pal,delay:DELAY,transparent:true,transparentIndex:T,dispose:1})}
+   gif.writeFrame(idx,PX,PX,{palette:pal,delay:dl,transparent:true,transparentIndex:T,dispose:1})}
   if(onProgress)onProgress((i+1)/FRAMES);
-  if(i%3===2)await yieldUI();
+  await yieldUI();
  }
  gif.finish();
  return new Blob([gif.bytes()],{type:'image/gif'});
